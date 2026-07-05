@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RT VILLAS — Досье объекта. Адлер, Сочи</title>
+<meta name="description" content="Резиденции у моря в Адлерском районе Сочи. Каждая цифра — из документа. Досье по каждому лоту — по запросу.">
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* ============ база ============ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--c-ink);
+  background: var(--c-canvas);
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+.wrap { max-width: var(--page-max); margin: 0 auto; padding: 0 var(--page-pad); }
+
+h1, h2, h3, .display { font-family: var(--font-display); font-weight: 400; }
+
+.label {
+  font-family: var(--font-sans);
+  font-size: var(--fs-label);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--c-ink-soft);
+}
+.label--accent { color: var(--c-accent); }
+
+section { padding: var(--sp-section) 0; }
+.section-head {
+  display: flex; align-items: baseline; gap: var(--sp-3);
+  border-top: var(--rule-strong);
+  padding-top: var(--sp-2);
+  margin-bottom: var(--sp-5);
+}
+.section-head .idx { font-family: var(--font-display); font-size: var(--fs-data-big); color: var(--c-accent); min-width: 64px; }
+.section-head h2 { font-size: var(--fs-h2); line-height: 1.15; }
+.section-head .label { margin-left: auto; text-align: right; }
+
+/* ============ шапка ============ */
+header {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--c-canvas);
+  border-bottom: var(--rule);
+  height: var(--header-h);
+}
+.header-inner {
+  max-width: var(--page-max); margin: 0 auto; padding: 0 var(--page-pad);
+  height: var(--header-h);
+  display: flex; align-items: center; gap: var(--sp-4);
+}
+.wordmark {
+  font-family: var(--font-sans);
+  font-size: 15px; letter-spacing: var(--ls-wordmark);
+  text-transform: uppercase; font-weight: 500; white-space: nowrap;
+}
+.wordmark span { color: var(--c-accent); }
+nav.main-nav { display: flex; gap: var(--sp-3); margin-left: auto; }
+nav.main-nav a {
+  font-size: var(--fs-label); letter-spacing: var(--ls-label); text-transform: uppercase;
+  color: var(--c-ink-soft); padding: 6px 2px; border-bottom: 1px solid transparent;
+  transition: color var(--t-quiet), border-color var(--t-quiet);
+}
+nav.main-nav a:hover { color: var(--c-ink); border-bottom-color: var(--c-accent); }
+.btn {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: var(--fs-label); letter-spacing: var(--ls-label); text-transform: uppercase;
+  padding: 14px 28px;
+  border: var(--border-accent);
+  border-radius: var(--radius);
+  color: var(--c-accent-ink);
+  background: transparent;
+  cursor: pointer;
+  transition: background var(--t-quiet), color var(--t-quiet);
+  white-space: nowrap;
+}
+.btn:hover { background: var(--c-accent); color: var(--c-inverse-text); }
+.btn--solid { background: var(--c-ink); border-color: var(--c-ink); color: var(--c-canvas); }
+.btn--solid:hover { background: var(--c-accent); border-color: var(--c-accent); color: var(--c-inverse-text); }
+header .btn { padding: 10px 22px; }
+
+/* ============ первый экран ============ */
+.hero { padding: var(--sp-6) 0 0; }
+.hero-grid { display: grid; grid-template-columns: 1fr; gap: var(--sp-5); }
+.hero h1 {
+  font-size: var(--fs-hero); line-height: var(--lh-hero);
+  max-width: 22ch; margin: var(--sp-3) 0 var(--sp-4);
+}
+.hero .lede { max-width: 52ch; color: var(--c-ink-soft); margin-bottom: var(--sp-4); }
+.hero-ctas { display: flex; gap: var(--sp-2); flex-wrap: wrap; margin-bottom: var(--sp-6); }
+.figure { position: relative; }
+.figure img { width: 100%; height: auto; }
+.fig-tag {
+  position: absolute; top: var(--sp-2); left: var(--sp-2);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--c-inverse-text);
+  background: rgba(34,33,29,0.55);
+  padding: 5px 10px;
+}
+.hud {
+  display: flex; flex-wrap: wrap;
+  border: var(--rule-strong); border-top: none;
+  background: var(--c-paper);
+}
+.hud div {
+  flex: 1 1 auto;
+  padding: var(--sp-2) var(--sp-3);
+  border-right: var(--rule);
+  min-width: 160px;
+}
+.hud div:last-child { border-right: none; }
+.hud .k { display: block; font-size: 10px; letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--c-ink-soft); margin-bottom: 2px; }
+.hud .v { font-size: var(--fs-data); font-variant-numeric: tabular-nums; }
+
+/* лента параметров */
+.datastrip {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  border: var(--rule-strong);
+  margin-top: var(--sp-6);
+  background: var(--c-paper);
+}
+.datastrip div { padding: var(--sp-3); border-right: var(--rule); }
+.datastrip div:last-child { border-right: none; }
+.datastrip .num { font-family: var(--font-display); font-size: var(--fs-data-big); line-height: 1.1; display: block; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.datastrip .unit { font-size: var(--fs-small); color: var(--c-ink-soft); }
+
+/* ============ место ============ */
+.place p.editorial {
+  font-family: var(--font-display);
+  font-size: var(--fs-h3); line-height: 1.5;
+  max-width: 34em; margin-bottom: var(--sp-5);
+}
+.place .note { max-width: 52ch; color: var(--c-ink-soft); font-size: var(--fs-small); margin-top: var(--sp-3); }
+
+/* ============ досье виллы ============ */
+.dossier { background: var(--c-canvas-deep); }
+.dossier-intro { max-width: 58ch; color: var(--c-ink-soft); margin-bottom: var(--sp-5); }
+.dossier-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: var(--sp-5); align-items: stretch; }
+.dossier-grid .figure { height: 100%; }
+.dossier-grid .figure img { height: 100%; object-fit: cover; }
+.spec-sheet { background: var(--c-paper); border: var(--rule-strong); }
+.spec-sheet .sheet-head { padding: var(--sp-3); border-bottom: var(--rule-strong); }
+.spec-sheet .sheet-head .display { font-size: var(--fs-h3); margin-top: 6px; }
+.spec-row {
+  display: flex; justify-content: space-between; gap: var(--sp-2);
+  padding: 14px var(--sp-3);
+  border-bottom: var(--rule);
+  font-size: var(--fs-data);
+}
+.spec-row:last-of-type { border-bottom: none; }
+.spec-row .k { color: var(--c-ink-soft); font-size: var(--fs-label); letter-spacing: var(--ls-label); text-transform: uppercase; padding-top: 3px; }
+.spec-row .v { text-align: right; font-variant-numeric: tabular-nums; }
+.sheet-foot { padding: var(--sp-2) var(--sp-3); border-top: var(--rule-strong); font-size: var(--fs-small); color: var(--c-ink-soft); }
+.sheet-foot a { color: var(--c-accent-ink); border-bottom: 1px solid var(--c-accent); }
+
+/* ============ генплан ============ */
+.plan-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: var(--sp-5); align-items: start; }
+.plan-svg-box { border: var(--rule-strong); background: var(--c-paper); padding: var(--sp-3); }
+.plan-caption { font-size: var(--fs-small); color: var(--c-ink-soft); margin-top: var(--sp-2); max-width: 60ch; }
+svg .plot { cursor: pointer; }
+svg .plot rect { fill: var(--plot-fill); stroke: var(--c-line-strong); stroke-width: 1; transition: fill var(--t-quiet); }
+svg .plot:hover rect, svg .plot:focus rect, svg .plot.active rect { fill: var(--plot-fill-hover); stroke: var(--c-accent); }
+svg .plot { outline: none; }
+svg text { font-family: var(--font-sans); fill: var(--c-ink); }
+svg .plot-num { font-family: var(--font-display); font-size: 36px; }
+svg .plot-area { font-size: 15px; fill: var(--c-ink-soft); }
+svg .zone-label { font-size: 11px; letter-spacing: 0.18em; fill: var(--c-ink-soft); text-transform: uppercase; }
+.villa-card { background: var(--c-paper); border: var(--rule-strong); position: sticky; top: calc(var(--header-h) + 16px); }
+.villa-card .vc-head { padding: var(--sp-3); border-bottom: var(--rule-strong); }
+.villa-card .vc-head .display { font-size: var(--fs-h3); margin-top: 6px; }
+.villa-card .vc-status {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: var(--fs-label); letter-spacing: var(--ls-label); text-transform: uppercase;
+  color: var(--c-accent-ink); margin-top: 10px;
+}
+.villa-card .vc-status::before { content: ""; width: 8px; height: 8px; background: var(--c-accent); display: inline-block; }
+.villa-card .vc-cta { padding: var(--sp-3); }
+.villa-card .vc-cta .btn { width: 100%; text-align: center; }
+
+/* ============ документы ============ */
+.docs { background: var(--c-canvas-deep); }
+.docs-lede { font-family: var(--font-display); font-size: var(--fs-h3); line-height: 1.5; max-width: 30em; margin-bottom: var(--sp-5); }
+.doc-list { border-top: var(--rule-strong); }
+.doc-item {
+  display: grid; grid-template-columns: 64px 1fr 1.2fr; gap: var(--sp-3);
+  padding: var(--sp-3) 0; border-bottom: var(--rule); align-items: baseline;
+}
+.doc-item .doc-idx { font-family: var(--font-display); color: var(--c-accent); font-size: 20px; }
+.doc-item h3 { font-size: 21px; }
+.doc-item p { color: var(--c-ink-soft); font-size: var(--fs-small); }
+.docs .regime-line { margin-top: var(--sp-4); font-size: var(--fs-small); color: var(--c-ink-soft); max-width: 70ch; }
+
+/* ============ отличие ============ */
+.pillars { display: grid; grid-template-columns: repeat(4, 1fr); border: var(--rule-strong); background: var(--c-paper); }
+.pillar { padding: var(--sp-4) var(--sp-3); border-right: var(--rule); }
+.pillar:last-child { border-right: none; }
+.pillar .p-idx { font-family: var(--font-display); font-size: var(--fs-data-big); color: var(--c-accent); display: block; margin-bottom: var(--sp-3); }
+.pillar h3 { font-size: 21px; margin-bottom: var(--sp-2); }
+.pillar p { font-size: var(--fs-small); color: var(--c-ink-soft); }
+
+/* ============ запрос ============ */
+.request .req-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-6); align-items: start; }
+.request h2 { font-size: var(--fs-h2); margin-bottom: var(--sp-3); }
+.request p { color: var(--c-ink-soft); max-width: 44ch; }
+.req-form { display: grid; gap: var(--sp-3); background: var(--c-paper); border: var(--rule-strong); padding: var(--sp-4); }
+.req-form label { display: block; }
+.req-form .k { display: block; font-size: var(--fs-label); letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--c-ink-soft); margin-bottom: 8px; }
+.req-form input {
+  width: 100%; padding: 14px 16px;
+  font-family: var(--font-sans); font-size: var(--fs-data);
+  border: var(--rule-strong); border-radius: var(--radius);
+  background: var(--c-canvas); color: var(--c-ink);
+}
+.req-form input:focus { outline: none; border-color: var(--c-accent); }
+
+/* ============ подвал ============ */
+footer { border-top: var(--rule-strong); padding: var(--sp-5) 0; }
+.foot-grid { display: flex; gap: var(--sp-4); align-items: baseline; flex-wrap: wrap; }
+.foot-grid .label { margin-left: auto; }
+.fineprint { margin-top: var(--sp-4); font-size: 13px; color: var(--c-ink-soft); max-width: 90ch; line-height: 1.6; }
+
+/* ============ адаптив ============ */
+@media (max-width: 960px) {
+  .dossier-grid, .plan-grid, .req-grid { grid-template-columns: 1fr; }
+  .pillars { grid-template-columns: 1fr 1fr; }
+  .pillar { border-bottom: var(--rule); }
+  .datastrip { grid-template-columns: 1fr 1fr; }
+  .datastrip div { border-bottom: var(--rule); }
+  nav.main-nav { display: none; }
+}
+@media (max-width: 560px) {
+  .pillars, .datastrip { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ================= шапка ================= -->
+<header>
+  <div class="header-inner">
+    <a class="wordmark" href="#top">RT&nbsp;<span>VILLAS</span></a>
+    <nav class="main-nav" aria-label="Разделы досье">
+      <a href="#place">Место</a>
+      <a href="#villa3">Дело :2527</a>
+      <a href="#plan">Генплан</a>
+      <a href="#docs">Документы</a>
+      <a href="#difference">Отличие</a>
+    </nav>
+    <a class="btn" href="#request">Запросить</a>
+  </div>
+</header>
+
+<!-- ================= 01 · первый экран ================= -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <p class="label label--accent">Досье объекта · Адлерский район · Сочи</p>
+    <h1>Резиденции у&nbsp;моря,<br>описанные языком документов.</h1>
+    <p class="lede">Мы не подбираем эпитеты — мы показываем выписки. Каждая цифра на этой странице взята из документации по конкретному участку. Полное досье любого лота — по запросу.</p>
+    <div class="hero-ctas">
+      <a class="btn btn--solid" href="#request">Запросить досье</a>
+      <a class="btn" href="#plan">Смотреть генплан</a>
+    </div>
+
+    <figure class="figure">
+      <span class="fig-tag">Проектная визуализация</span>
+      <img src="assets/20r-enclave-aerial.jpg" alt="Проектная визуализация комплекса резиденций: частная внутренняя улица, бассейн и сады" width="2200" height="1222">
+    </figure>
+    <div class="hud" aria-label="Паспорт объекта">
+      <div><span class="k">Кадастровый квартал</span><span class="v">23:49:0402016</span></div>
+      <div><span class="k">Адрес</span><span class="v">пер. Хостинский, Адлер</span></div>
+      <div><span class="k">Земли</span><span class="v">населённых пунктов · ИЖС</span></div>
+      <div><span class="k">Данные участков</span><span class="v">ЕГРН, снимок 07.2024</span></div>
+    </div>
+
+    <div class="datastrip" aria-label="Ключевые параметры">
+      <div><span class="label">Резиденций</span><span class="num">7</span><span class="unit">частный масштаб</span></div>
+      <div><span class="label">Участки</span><span class="num">400–531</span><span class="unit">м² по ЕГРН</span></div>
+      <div><span class="label">Дома</span><span class="num">до 300</span><span class="unit">м², предельно</span></div>
+      <div><span class="label">Уровней</span><span class="num">3</span><span class="unit">надземных</span></div>
+      <div><span class="label">Высота</span><span class="num">до 12</span><span class="unit">метров</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 02 · место ================= -->
+<section class="place" id="place">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="idx">01</span>
+      <h2>Место</h2>
+      <span class="label">Адлер · Черноморское побережье</span>
+    </div>
+    <p class="editorial">Тихий переулок Адлерского района: единый квартал, один архитектурный язык, собственная внутренняя улица и общий бассейн внутри периметра. Характер места мы описываем в досье так же, как участки, — фактами.</p>
+    <figure class="figure">
+      <span class="fig-tag">Проектная визуализация</span>
+      <img src="assets/33r-seafront-aerial.jpg" alt="Проектная визуализация квартала резиденций на побережье" width="2200" height="1222">
+    </figure>
+    <p class="note">Сезонность, транспортная доступность и окружение — отдельным разделом в составе досье: цифрами и картами, без превосходных степеней.</p>
+  </div>
+</section>
+
+<!-- ================= 03 · досье виллы 3 ================= -->
+<section class="dossier" id="villa3">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="idx">02</span>
+      <h2>Дело № :2527 — Вилла 3</h2>
+      <span class="label">Формат: одна страница на лот</span>
+    </div>
+    <p class="dossier-intro">О каждой резиденции мы говорим одинаково: участок, регламент, документы — на одной странице. Ниже — вилла 3, самый документально полный лот квартала. Досье остальных лотов устроены так же.</p>
+
+    <div class="dossier-grid">
+      <figure class="figure">
+        <span class="fig-tag">Проектная визуализация</span>
+        <img src="assets/19rn-golden-hour-pool.jpg" alt="Проектная визуализация: терраса с бассейном и вид в сторону моря на закате" width="2200" height="1222">
+      </figure>
+
+      <aside class="spec-sheet" aria-label="Паспорт виллы 3">
+        <div class="sheet-head">
+          <span class="label label--accent">Паспорт лота</span>
+          <p class="display">Вилла 3 · участок :2527</p>
+        </div>
+        <div class="spec-row"><span class="k">Кадастровый номер</span><span class="v">23:49:0402016:2527</span></div>
+        <div class="spec-row"><span class="k">Участок</span><span class="v">518 м² · ЕГРН</span></div>
+        <div class="spec-row"><span class="k">Дом</span><span class="v">до 300 м²</span></div>
+        <div class="spec-row"><span class="k">Уровни</span><span class="v">3 надземных</span></div>
+        <div class="spec-row"><span class="k">Высота</span><span class="v">до 12 м</span></div>
+        <div class="spec-row"><span class="k">Отступы от границ</span><span class="v">3 м</span></div>
+        <div class="spec-row"><span class="k">Озеленение</span><span class="v">не менее 30% участка</span></div>
+        <div class="spec-row"><span class="k">Пятно застройки</span><span class="v">не более 40% участка</span></div>
+        <div class="sheet-foot">Предельные параметры — по градостроительной документации квартала. Состав досье лота — <a href="#docs">в разделе 04</a>.</div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 04 · генплан ================= -->
+<section class="plan" id="plan">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="idx">03</span>
+      <h2>Генплан</h2>
+      <span class="label">Семь лотов · один квартал</span>
+    </div>
+
+    <div class="plan-grid">
+      <div>
+        <div class="plan-svg-box">
+          <svg viewBox="0 0 1000 620" role="group" aria-label="Условная схема расположения семи резиденций" id="plansvg">
+            <!-- полоса моря -->
+            <rect x="0" y="0" width="1000" height="72" fill="var(--sea-fill)"/>
+            <text class="zone-label" x="500" y="42" text-anchor="middle">Чёрное море</text>
+            <line x1="0" y1="72" x2="1000" y2="72" stroke="var(--c-line-strong)" stroke-width="1"/>
+            <line x1="0" y1="108" x2="1000" y2="108" stroke="var(--c-line)" stroke-width="1" stroke-dasharray="4 5"/>
+
+            <!-- участок общего бассейна -->
+            <g>
+              <rect x="60" y="140" width="180" height="120" fill="var(--sea-fill)" stroke="var(--c-line-strong)"/>
+              <text class="zone-label" x="150" y="196" text-anchor="middle">Бассейн</text>
+              <text class="plot-area" x="150" y="216" text-anchor="middle">общий · уч. :9</text>
+            </g>
+
+            <!-- ряд А: виллы 1-3 -->
+            <g class="plot" tabindex="0" data-villa="1"><rect x="280" y="140" width="180" height="150"/><text class="plot-num" x="300" y="185">1</text><text class="plot-area" x="300" y="270">443 м²</text></g>
+            <g class="plot" tabindex="0" data-villa="2"><rect x="480" y="140" width="215" height="150"/><text class="plot-num" x="500" y="185">2</text><text class="plot-area" x="500" y="270">531 м²</text></g>
+            <g class="plot" tabindex="0" data-villa="3"><rect x="715" y="140" width="210" height="150"/><text class="plot-num" x="735" y="185">3</text><text class="plot-area" x="735" y="270">518 м²</text></g>
+
+            <!-- внутренняя улица -->
+            <rect x="60" y="318" width="865" height="44" fill="var(--sea-fill)" stroke="var(--c-line)"/>
+            <text class="zone-label" x="500" y="345" text-anchor="middle">Внутренняя улица · уч. :2535</text>
+
+            <!-- ряд Б: виллы 4-7 -->
+            <g class="plot" tabindex="0" data-villa="4"><rect x="60" y="390" width="185" height="145"/><text class="plot-num" x="80" y="435">4</text><text class="plot-area" x="80" y="515">458 м²</text></g>
+            <g class="plot" tabindex="0" data-villa="5"><rect x="265" y="390" width="175" height="145"/><text class="plot-num" x="285" y="435">5</text><text class="plot-area" x="285" y="515">435 м²</text></g>
+            <g class="plot" tabindex="0" data-villa="6"><rect x="460" y="390" width="160" height="145"/><text class="plot-num" x="480" y="435">6</text><text class="plot-area" x="480" y="515">400 м²</text></g>
+            <g class="plot" tabindex="0" data-villa="7"><rect x="725" y="390" width="200" height="145"/><text class="plot-num" x="745" y="435">7</text><text class="plot-area" x="745" y="515">506 м²</text></g>
+
+            <text class="plot-area" x="60" y="590">Схема без масштаба</text>
+          </svg>
+        </div>
+        <p class="plan-caption">Схема условна: нумерация, границы и взаимное расположение — иллюстративные. Точная схема планировочной организации участков — в составе досье.</p>
+      </div>
+
+      <aside class="villa-card" aria-live="polite" id="villacard">
+        <div class="vc-head">
+          <span class="label label--accent">Карточка лота</span>
+          <p class="display" id="vc-title">Вилла 3 · участок :2527</p>
+          <span class="vc-status">Доступно</span>
+        </div>
+        <div class="spec-row"><span class="k">Кадастровый номер</span><span class="v" id="vc-parcel">23:49:0402016:2527</span></div>
+        <div class="spec-row"><span class="k">Участок</span><span class="v" id="vc-area">518 м² · ЕГРН</span></div>
+        <div class="spec-row"><span class="k">Дом</span><span class="v" id="vc-house">до 300 м²</span></div>
+        <div class="spec-row"><span class="k">Уровни</span><span class="v">3 надземных</span></div>
+        <div class="vc-cta"><a class="btn" href="#request">Запросить досье лота</a></div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 05 · документы ================= -->
+<section class="docs" id="docs">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="idx">04</span>
+      <h2>Документация по каждому лоту</h2>
+      <span class="label">Досье — до сделки</span>
+    </div>
+    <p class="docs-lede">Обещания стареют, документы — нет. Покупатель получает досье лота до сделки — и может сверить каждую цифру этой страницы с первоисточником.</p>
+
+    <div class="doc-list">
+      <div class="doc-item">
+        <span class="doc-idx">4.1</span>
+        <h3>Выписка ЕГРН по участку</h3>
+        <p>Границы, площадь, правовой режим — государственный реестр, снимок июля 2024 года.</p>
+      </div>
+      <div class="doc-item">
+        <span class="doc-idx">4.2</span>
+        <h3>Градостроительная документация квартала</h3>
+        <p>Предельные параметры дома: высота, этажность, отступы, пятно застройки, озеленение.</p>
+      </div>
+      <div class="doc-item">
+        <span class="doc-idx">4.3</span>
+        <h3>Схема планировочной организации участка</h3>
+        <p>Точное положение дома, въезда и инженерных трасс на конкретном участке.</p>
+      </div>
+      <div class="doc-item">
+        <span class="doc-idx">4.4</span>
+        <h3>Технические условия инженерных подключений</h3>
+        <p>Вода и водоотведение — документами от ресурсоснабжающих организаций.</p>
+      </div>
+      <div class="doc-item">
+        <span class="doc-idx">4.5</span>
+        <h3>Кадастровая оценка участка</h3>
+        <p>Официальная оценочная база по каждому участку — открытая точка отсчёта.</p>
+      </div>
+    </div>
+
+    <p class="regime-line">Единый регламент квартала — один на все лоты: высота до 12 м, три надземных уровня, отступы от границ 3 м, озеленение не менее 30% участка, пятно застройки не более 40%.</p>
+  </div>
+</section>
+
+<!-- ================= 06 · отличие ================= -->
+<section class="difference" id="difference">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="idx">05</span>
+      <h2>Отличие</h2>
+      <span class="label">Почему это не объявление на агрегаторе</span>
+    </div>
+    <div class="pillars">
+      <div class="pillar">
+        <span class="p-idx">I</span>
+        <h3>Документы вперёд слов</h3>
+        <p>Досье лота передаётся до сделки. Ни одной цифры без первоисточника — это правило страницы, а не фигура речи.</p>
+      </div>
+      <div class="pillar">
+        <span class="p-idx">II</span>
+        <h3>Единый регламент</h3>
+        <p>Один кадастровый квартал, один регламент застройки. Масштаб и характер посёлка защищены правилами, а не обещаниями.</p>
+      </div>
+      <div class="pillar">
+        <span class="p-idx">III</span>
+        <h3>Собственная инфраструктура</h3>
+        <p>Внутренняя улица и общий бассейн — отдельные участки внутри периметра комплекса, а не серая зона за забором.</p>
+      </div>
+      <div class="pillar">
+        <span class="p-idx">IV</span>
+        <h3>Частный масштаб</h3>
+        <p>Счёт резиденций идёт на единицы, а не на сотни. Один архитектурный язык на весь квартал.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 07 · запрос ================= -->
+<section class="request" id="request">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="idx">06</span>
+      <h2>Запросить досье</h2>
+      <span class="label">Ответим лично</span>
+    </div>
+    <div class="req-grid">
+      <div>
+        <p>Пришлём состав досье, паспорт интересующего лота и порядок знакомства с объектом. Без рассылок — один ответ на один запрос.</p>
+      </div>
+      <form class="req-form" action="#" method="get" onsubmit="return false">
+        <label><span class="k">Имя</span><input type="text" name="name" autocomplete="name"></label>
+        <label><span class="k">Телефон или мессенджер</span><input type="text" name="contact" autocomplete="tel"></label>
+        <button class="btn btn--solid" type="submit">Запросить</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ================= подвал ================= -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <span class="wordmark">RT&nbsp;<span>VILLAS</span></span>
+      <span class="label">Адлерский район · Сочи</span>
+    </div>
+    <p class="fineprint">RT VILLAS — рабочее обозначение проекта до присвоения имени. Визуализации являются проектными материалами; фактическая реализация может отличаться. Площади участков — по данным ЕГРН (снимок 07.2024); параметры домов — предельные значения по градостроительной документации квартала. Сведения носят информационный характер и не являются публичной офертой.</p>
+  </div>
+</footer>
+
+<script>
+// выбор виллы: наведение или фокус на участке обновляет карточку лота
+(function () {
+  var VILLAS = {
+    1: { parcel: "23:49:0402016:2525", area: "443 м² · ЕГРН", house: "до 265,8 м²" },
+    2: { parcel: "23:49:0402016:2526", area: "531 м² · ЕГРН", house: "до 300 м²" },
+    3: { parcel: "23:49:0402016:2527", area: "518 м² · ЕГРН", house: "до 300 м²" },
+    4: { parcel: "23:49:0402016:2521", area: "458 м² · ЕГРН", house: "до 274,8 м²" },
+    5: { parcel: "23:49:0402016:2522", area: "435 м² · ЕГРН", house: "до 261 м²" },
+    6: { parcel: "23:49:0402016:2523", area: "400 м² · ЕГРН", house: "до 240 м²" },
+    7: { parcel: "23:49:0402016:2536", area: "506 м² · ЕГРН", house: "до 300 м²" }
+  };
+  var title = document.getElementById("vc-title");
+  var parcel = document.getElementById("vc-parcel");
+  var area = document.getElementById("vc-area");
+  var house = document.getElementById("vc-house");
+  var plots = document.querySelectorAll("#plansvg .plot");
+  function show(n) {
+    var v = VILLAS[n];
+    if (!v) return;
+    title.textContent = "Вилла " + n + " · участок :" + v.parcel.split(":").pop();
+    parcel.textContent = v.parcel;
+    area.textContent = v.area;
+    house.textContent = v.house;
+    plots.forEach(function (p) { p.classList.toggle("active", p.dataset.villa === String(n)); });
+  }
+  plots.forEach(function (p) {
+    p.addEventListener("mouseenter", function () { show(p.dataset.villa); });
+    p.addEventListener("focus", function () { show(p.dataset.villa); });
+    p.addEventListener("click", function () { show(p.dataset.villa); });
+  });
+  show(3); // по умолчанию — лот с самым полным досье
+})();
+</script>
+</body>
+</html>

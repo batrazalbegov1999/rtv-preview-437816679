@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RT VILLAS — Смотрите с начала</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* ============================================================
+   Концепт «Кинофильм» — структурные стили.
+   Палитра, шрифты, размеры и отступы — в tokens.css.
+   ============================================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--c-canvas);
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+  font-weight: var(--fw-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+img { display: block; max-width: 100%; }
+
+/* ---------- общие элементы ---------- */
+.kicker {
+  font-family: var(--font-sans);
+  font-size: var(--fs-kicker);
+  font-weight: var(--fw-sans-md);
+  letter-spacing: var(--ls-kicker);
+  text-transform: uppercase;
+  color: var(--c-accent);
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: var(--fw-display);
+  line-height: var(--lh-display);
+}
+
+.wrap {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding-left: var(--pad-x);
+  padding-right: var(--pad-x);
+}
+
+/* ---------- шапка ---------- */
+header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 40;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--pad-x);
+  background: var(--scrim-header);
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-size: var(--fs-body);
+  letter-spacing: var(--ls-wordmark);
+  text-transform: uppercase;
+  color: var(--c-ink);
+  text-decoration: none;
+}
+
+.header-cta {
+  font-size: var(--fs-kicker);
+  font-weight: var(--fw-sans-md);
+  letter-spacing: var(--ls-credit);
+  text-transform: uppercase;
+  color: var(--c-ink);
+  text-decoration: none;
+  border: var(--hairline) solid var(--c-accent-dim);
+  border-radius: var(--radius);
+  padding: var(--sp-2xs) var(--sp-s);
+  transition: border-color var(--dur-fade) var(--ease-out), color var(--dur-fade) var(--ease-out);
+}
+.header-cta:hover { border-color: var(--c-accent); color: var(--c-accent-bright); }
+
+/* ---------- сцена 0: титульный кадр ---------- */
+.pretitle {
+  min-height: min(100vh, 56rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--sp-m);
+  background: var(--c-canvas-deep);
+  padding: calc(var(--header-h) + var(--sp-xl)) var(--pad-x) var(--sp-xl);
+}
+
+.pretitle h1 {
+  font-size: var(--fs-hero);
+  max-width: 14em;
+}
+
+.pretitle .lede {
+  color: var(--c-ink-dim);
+  max-width: var(--measure);
+}
+
+.scroll-hint {
+  margin-top: var(--sp-l);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-xs);
+  color: var(--c-ink-faint);
+  font-size: var(--fs-kicker);
+  letter-spacing: var(--ls-credit);
+  text-transform: uppercase;
+}
+.scroll-hint::after {
+  content: "";
+  width: var(--hairline);
+  height: var(--sp-l);
+  background: var(--c-accent);
+}
+
+/* ---------- кинолента: три кадра, один жест прокрутки ---------- */
+.scrub { height: var(--scrub-height); position: relative; }
+
+.scrub-frame {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  will-change: opacity;
+}
+.stage:first-child { opacity: 1; }
+
+.stage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+}
+.stage:nth-child(1) img { object-position: var(--img-pos-frame1); }
+.stage:nth-child(2) img { object-position: var(--img-pos-frame2); }
+.stage:nth-child(3) img { object-position: var(--img-pos-frame3); }
+
+.stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--scrim-frame);
+}
+
+.stage-caption {
+  position: absolute;
+  z-index: 2;
+  left: 0; right: 0;
+  bottom: clamp(3rem, 12vh, 7rem);
+  text-align: center;
+  padding: 0 var(--pad-x);
+}
+.stage-caption .kicker { display: block; margin-bottom: var(--sp-s); }
+.stage-caption .title { font-size: var(--fs-title); }
+.stage-caption .line {
+  margin-top: var(--sp-s);
+  color: var(--c-ink-dim);
+  max-width: var(--measure);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* счётчик кадров: 01 02 03 */
+.ticks {
+  position: absolute;
+  z-index: 3;
+  left: var(--pad-x);
+  bottom: var(--sp-m);
+  display: flex;
+  gap: var(--sp-s);
+  font-size: var(--fs-kicker);
+  letter-spacing: var(--ls-credit);
+  color: var(--c-ink-faint);
+}
+.ticks span { transition: color var(--dur-fade) var(--ease-out); }
+.ticks span.on { color: var(--c-accent); }
+
+/* ---------- цифры как титры ---------- */
+.numbers {
+  background: var(--c-canvas);
+  padding: var(--pad-section) 0;
+  border-top: var(--hairline) solid var(--c-line);
+}
+
+.numbers .grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-xl) var(--sp-l);
+  text-align: center;
+}
+
+.num .value {
+  font-family: var(--font-display);
+  font-size: var(--fs-counter);
+  line-height: var(--lh-display);
+  color: var(--c-ink);
+}
+.num .value sup {
+  font-size: 40%;
+  vertical-align: super;
+}
+.num .unit { color: var(--c-accent); }
+.num .label {
+  margin-top: var(--sp-s);
+  font-size: var(--fs-kicker);
+  font-weight: var(--fw-sans-md);
+  letter-spacing: var(--ls-kicker);
+  text-transform: uppercase;
+  color: var(--c-ink-dim);
+}
+
+/* ---------- серифная пауза ---------- */
+.editorial {
+  background: var(--c-canvas);
+  padding: var(--pad-section) 0;
+  border-top: var(--hairline) solid var(--c-line);
+}
+.editorial .quote {
+  font-size: var(--fs-edit);
+  max-width: 22em;
+}
+.editorial .quote em { font-style: italic; color: var(--c-accent-bright); }
+.editorial .body {
+  margin-top: var(--sp-l);
+  color: var(--c-ink-dim);
+  max-width: var(--measure);
+}
+
+/* ---------- факты, набранные как титры ---------- */
+.credits {
+  background: var(--c-canvas-lift);
+  padding: var(--pad-section) 0;
+}
+.credits .kicker { display: block; text-align: center; margin-bottom: var(--sp-xl); }
+
+.credit-list {
+  max-width: calc(var(--content-max) * 0.72);
+  margin: 0 auto;
+}
+.credit {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-s);
+  padding: var(--sp-s) 0;
+}
+.credit + .credit { border-top: var(--hairline) solid var(--c-line); }
+.credit .role {
+  flex: 0 0 46%;
+  font-size: var(--fs-kicker);
+  font-weight: var(--fw-sans-md);
+  letter-spacing: var(--ls-credit);
+  text-transform: uppercase;
+  color: var(--c-ink-faint);
+  text-align: right;
+}
+.credit .name {
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: var(--fs-body);
+  color: var(--c-ink);
+}
+
+/* ---------- финал ---------- */
+.finale {
+  position: relative;
+  min-height: min(100vh, 52rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
+.finale img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.finale::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--scrim-finale);
+  z-index: 1;
+}
+.finale .inner {
+  position: relative;
+  z-index: 2;
+  padding: var(--pad-section) var(--pad-x);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-m);
+}
+.finale h2 { font-size: var(--fs-h2); }
+.finale .line { color: var(--c-ink-dim); max-width: var(--measure); }
+
+.cta {
+  margin-top: var(--sp-m);
+  display: inline-block;
+  font-size: var(--fs-small);
+  font-weight: var(--fw-sans-md);
+  letter-spacing: var(--ls-kicker);
+  text-transform: uppercase;
+  color: var(--c-ink);
+  text-decoration: none;
+  border: var(--hairline) solid var(--c-accent);
+  border-radius: var(--radius);
+  padding: var(--sp-s) var(--sp-l);
+  transition: background var(--dur-fade) var(--ease-out), color var(--dur-fade) var(--ease-out);
+}
+.cta:hover { background: var(--c-accent); color: var(--c-canvas-deep); }
+
+/* ---------- подвал ---------- */
+footer {
+  background: var(--c-canvas-deep);
+  padding: var(--sp-xl) 0;
+}
+footer .row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-s);
+  color: var(--c-ink-faint);
+  font-size: var(--fs-small);
+}
+footer .note {
+  margin-top: var(--sp-m);
+  color: var(--c-ink-faint);
+  font-size: var(--fs-kicker);
+  letter-spacing: var(--ls-credit);
+  text-transform: uppercase;
+}
+
+/* ---------- адаптив ---------- */
+@media (max-width: 860px) {
+  .numbers .grid { grid-template-columns: 1fr; gap: var(--sp-xl); }
+  .credit { flex-direction: column; gap: var(--sp-2xs); }
+  .credit .role { flex-basis: auto; text-align: left; }
+}
+
+/* ---------- при отключённой анимации — покадровый показ ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .scrub { height: auto; }
+  .scrub-frame { position: static; height: auto; overflow: visible; }
+  .stage { position: relative; opacity: 1 !important; height: 72vh; }
+  .ticks { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="wordmark" href="#">RT&nbsp;Villas</a>
+  <a class="header-cta" href="#finale">Запросить</a>
+</header>
+
+<!-- Сцена 0 — титульный кадр -->
+<section class="pretitle">
+  <span class="kicker">RT Villas представляет</span>
+  <h1 class="display">Смотрите с&nbsp;начала</h1>
+  <p class="lede">Частный посёлок у&nbsp;моря, снятый одним движением&nbsp;— место, объект, жизнь. Прокрутите: плёнка пойдёт.</p>
+  <div class="scroll-hint">Кадр первый</div>
+</section>
+
+<!-- Скраб: три кадра, один жест -->
+<div class="scrub" id="scrub">
+  <div class="scrub-frame">
+
+    <div class="stage" data-in="0" data-out="0.36">
+      <img src="assets/33r-aerial.jpg" alt="Аэровид посёлка на побережье" loading="eager">
+      <div class="stage-caption">
+        <span class="kicker">Кадр первый — место</span>
+        <div class="title display">Море ведёт съёмку</div>
+        <p class="line">Сочи, Адлерский район, переулок Хостинский. Закрытая территория со&nbsp;своей внутренней дорогой и&nbsp;бассейном посёлка.</p>
+      </div>
+    </div>
+
+    <div class="stage" data-in="0.30" data-out="0.70">
+      <img src="assets/08r-day.jpg" alt="Терраса резиденции днём" loading="lazy">
+      <div class="stage-caption">
+        <span class="kicker">Кадр второй — объект</span>
+        <div class="title display">Архитектура держит паузу</div>
+        <p class="line">Камень, стекло, дерево. Три надземных этажа&nbsp;— не&nbsp;выше двенадцати метров: масштаб, который не&nbsp;спорит с&nbsp;берегом.</p>
+      </div>
+    </div>
+
+    <div class="stage" data-in="0.64" data-out="1">
+      <img src="assets/08rn-night.jpg" alt="Та же терраса вечером, свет и закат" loading="lazy">
+      <div class="stage-caption">
+        <span class="kicker">Кадр третий — жизнь</span>
+        <div class="title display">Вечер. Свет. Дом.</div>
+        <p class="line">Тот&nbsp;же кадр после заката: терраса, вода, тишина. Дальше&nbsp;— без монтажа.</p>
+      </div>
+    </div>
+
+    <div class="ticks" aria-hidden="true">
+      <span class="on">01</span><span>02</span><span>03</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- Цифры как титры -->
+<section class="numbers" id="numbers">
+  <div class="wrap grid">
+    <div class="num">
+      <div class="value"><span class="count" data-count="4163">4&#8239;163</span>&nbsp;<span class="unit">м<sup>2</sup></span></div>
+      <div class="label">Площадь посёлка</div>
+    </div>
+    <div class="num">
+      <div class="value"><span class="count" data-count="7">7</span></div>
+      <div class="label">Резиденций</div>
+    </div>
+    <div class="num">
+      <div class="value"><span class="count" data-count="12">12</span>&nbsp;<span class="unit">м</span></div>
+      <div class="label">Максимальная высота</div>
+    </div>
+  </div>
+</section>
+
+<!-- Серифная пауза -->
+<section class="editorial">
+  <div class="wrap">
+    <p class="quote display">Большинство домов продаются. <em>Лучшие&nbsp;— остаются в&nbsp;семье.</em></p>
+    <p class="body">RT&nbsp;Villas&nbsp;— камерный посёлок отдельных резиденций на&nbsp;юге Сочи. Участки от&nbsp;400 до&nbsp;531&nbsp;м², резиденции площадью до&nbsp;300&nbsp;м², не&nbsp;менее трети каждого участка&nbsp;— под зеленью. Никаких секций и&nbsp;очередей: каждый дом стоит на&nbsp;собственной земле.</p>
+  </div>
+</section>
+
+<!-- Титры-факты -->
+<section class="credits">
+  <div class="wrap">
+    <span class="kicker">Титры</span>
+    <div class="credit-list">
+      <div class="credit"><div class="role">Место действия</div><div class="name">Сочи, Адлерский район, пер.&nbsp;Хостинский</div></div>
+      <div class="credit"><div class="role">Резиденций</div><div class="name">Семь</div></div>
+      <div class="credit"><div class="role">Площадь посёлка</div><div class="name">4&#8239;163&nbsp;м²</div></div>
+      <div class="credit"><div class="role">Участки</div><div class="name">От&nbsp;400 до&nbsp;531&nbsp;м²</div></div>
+      <div class="credit"><div class="role">Площадь резиденций</div><div class="name">До&nbsp;300&nbsp;м²</div></div>
+      <div class="credit"><div class="role">Этажность</div><div class="name">Три надземных этажа, до&nbsp;12&nbsp;метров</div></div>
+      <div class="credit"><div class="role">Озеленение</div><div class="name">Не&nbsp;менее 30% каждого участка</div></div>
+      <div class="credit"><div class="role">Инфраструктура</div><div class="name">Собственная дорога и&nbsp;бассейн посёлка</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Финал -->
+<section class="finale" id="finale">
+  <img src="assets/08rn-night.jpg" alt="" loading="lazy" aria-hidden="true">
+  <div class="inner">
+    <span class="kicker">Финал</span>
+    <h2 class="display">Финал у&nbsp;каждого свой</h2>
+    <p class="line">Показ&nbsp;— частный, по&nbsp;договорённости. Оставьте контакт, и&nbsp;мы соберём просмотр под вас.</p>
+    <a class="cta" href="#">Запросить показ</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <span class="wordmark">RT&nbsp;Villas</span>
+      <span>Сочи, Адлерский район</span>
+      <span>&copy; 2026</span>
+    </div>
+    <p class="note">Изображения&nbsp;— архитектурная визуализация проекта</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- кинолента: три кадра, плавное перекрытие и медленный наезд ---------- */
+  var scrub = document.getElementById("scrub");
+  var stages = scrub ? Array.prototype.slice.call(scrub.querySelectorAll(".stage")) : [];
+  var ticks = scrub ? Array.prototype.slice.call(scrub.querySelectorAll(".ticks span")) : [];
+  var FADE = 0.06; /* ширина зоны перекрытия на границах кадров */
+
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+  function applyScrub() {
+    var rect = scrub.getBoundingClientRect();
+    var runway = scrub.offsetHeight - window.innerHeight;
+    if (runway <= 0) return;
+    var p = clamp(-rect.top / runway, 0, 1);
+    var active = 0;
+
+    stages.forEach(function (st, i) {
+      var tIn = parseFloat(st.dataset.in);
+      var tOut = parseFloat(st.dataset.out);
+      var o;
+      if (p < tIn) o = 0;
+      else if (p < tIn + FADE && tIn > 0) o = (p - tIn) / FADE;
+      else if (p > tOut) o = 0;
+      else if (p > tOut - FADE && tOut < 1) o = (tOut - p) / FADE;
+      else o = 1;
+      o = clamp(o, 0, 1);
+      st.style.opacity = o;
+      st.style.zIndex = o > 0 ? 2 : 1;
+      if (o > 0.5) active = i;
+
+      /* медленный наезд камеры внутри окна кадра */
+      var span = tOut - tIn;
+      var local = clamp((p - tIn) / span, 0, 1);
+      var img = st.querySelector("img");
+      if (img) img.style.transform = "scale(" + (1.07 - 0.07 * local) + ")";
+    });
+
+    ticks.forEach(function (t, i) { t.classList.toggle("on", i === active); });
+  }
+
+  if (scrub && !reduced) {
+    var raf = null;
+    window.addEventListener("scroll", function () {
+      if (raf) return;
+      raf = requestAnimationFrame(function () { raf = null; applyScrub(); });
+    }, { passive: true });
+    window.addEventListener("resize", applyScrub);
+    applyScrub();
+  }
+
+  /* ---------- счётчики: итоговые значения записаны в разметке, анимация — при прокрутке ---------- */
+  var hasScrolled = false;
+  window.addEventListener("scroll", function once() {
+    hasScrolled = true;
+    window.removeEventListener("scroll", once);
+  }, { passive: true });
+
+  function fmt(n) {
+    var s = String(Math.round(n));
+    return s.length > 3 ? s.slice(0, -3) + " " + s.slice(-3) : s;
+  }
+
+  function runCounter(el) {
+    var target = parseFloat(el.dataset.count);
+    var t0 = null;
+    var durMs = 1400;
+    function step(ts) {
+      if (!t0) t0 = ts;
+      var k = clamp((ts - t0) / durMs, 0, 1);
+      var eased = 1 - Math.pow(1 - k, 3);
+      el.textContent = fmt(target * eased);
+      if (k < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  if ("IntersectionObserver" in window && !reduced) {
+    var seen = new WeakSet();
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting && hasScrolled && !seen.has(e.target)) {
+          seen.add(e.target);
+          runCounter(e.target);
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.6 });
+    document.querySelectorAll(".count").forEach(function (el) { io.observe(el); });
+  }
+})();
+</script>
+
+</body>
+</html>

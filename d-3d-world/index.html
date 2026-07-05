@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ru" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RT VILLAS — объёмная модель посёлка · Адлер, Сочи</title>
+<meta name="description" content="Частные резиденции у моря в Адлере. Объёмная модель посёлка: от плана до уровня улицы. Доступ — по приглашению.">
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* ================= база ================= */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;border-radius:var(--radius)}
+html{scroll-behavior:smooth}
+body{background:var(--c-ink);color:var(--c-text);font-family:var(--font-sans);font-size:var(--fs-body);line-height:var(--lh-body);-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+.kicker{font-family:var(--font-sans);font-size:var(--fs-micro);letter-spacing:var(--ls-caps);text-transform:uppercase;color:var(--c-accent)}
+.h-display{font-family:var(--font-display);font-weight:var(--fw-display);line-height:1.12}
+.micro{font-size:var(--fs-micro);letter-spacing:0.14em;text-transform:uppercase}
+.rv{opacity:1;transform:none}
+html.js .rv{opacity:0;transform:translateY(1.5rem);transition:opacity .9s ease,transform .9s ease}
+html.js .rv.on{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){html.js .rv{opacity:1;transform:none;transition:none}}
+
+/* ================= шапка ================= */
+.hdr{position:fixed;inset:0 0 auto 0;z-index:50;height:var(--header-h);display:flex;align-items:center;justify-content:space-between;padding:0 var(--gutter);color:var(--c-text-inv);transition:background .4s ease, box-shadow .4s ease}
+.hdr::before{content:"";position:absolute;inset:0;background:linear-gradient(to bottom, rgba(14,17,21,.55), rgba(14,17,21,0));pointer-events:none;transition:opacity .4s ease}
+.hdr.solid{background:var(--c-ink)}
+.hdr.solid::before{opacity:0}
+.wordmark{position:relative;font-family:var(--font-wordmark);font-size:1.1875rem;letter-spacing:var(--ls-wordmark);text-transform:uppercase;color:var(--c-text-inv)}
+.hdr-nav{position:relative;display:flex;align-items:center;gap:var(--s-6)}
+.hdr-nav a{font-size:var(--fs-micro);letter-spacing:var(--ls-caps);text-transform:uppercase;color:var(--c-muted-inv)}
+.hdr-nav a:hover{color:var(--c-text-inv)}
+.hdr-cta{display:inline-block;border:var(--hairline) solid var(--c-accent);color:var(--c-accent) !important;padding:var(--s-3) var(--s-5)}
+.hdr-cta:hover{background:var(--c-accent);color:var(--c-ink) !important}
+
+/* ================= первый экран ================= */
+.hero{position:relative;height:100vh;max-height:75rem;min-height:36rem;overflow:hidden;color:var(--c-text-inv)}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(80deg, rgba(14,17,21,.62) 0%, rgba(14,17,21,.28) 42%, transparent 68%),linear-gradient(to top, rgba(14,17,21,.82) 0%, rgba(14,17,21,.30) 48%, rgba(14,17,21,.30) 100%)}
+.hero-copy{position:absolute;z-index:2;left:var(--gutter);right:var(--gutter);bottom:clamp(4rem,10vh,7rem);max-width:46rem}
+.hero-copy .kicker{margin-bottom:var(--s-5)}
+.hero h1{font-size:var(--fs-hero);margin-bottom:var(--s-5)}
+.hero p{max-width:var(--measure);color:rgba(234,229,217,.85)}
+.hero-cue{position:absolute;z-index:2;left:var(--gutter);bottom:var(--s-5);display:flex;align-items:center;gap:var(--s-3);font-size:var(--fs-micro);letter-spacing:var(--ls-caps);text-transform:uppercase;color:var(--c-muted-inv)}
+.hero-cue::before{content:"";display:block;width:2.75rem;height:var(--hairline);background:var(--c-accent)}
+.plate-note{position:absolute;z-index:2;right:var(--gutter);bottom:var(--s-5);font-size:var(--fs-micro);letter-spacing:0.14em;text-transform:uppercase;color:rgba(234,229,217,.5)}
+
+/* ================= объёмная сцена ================= */
+.scene-track{position:relative;height:var(--track-len);background:var(--c-ink)}
+.stage{position:sticky;top:0;height:100vh;max-height:var(--stage-max);overflow:hidden;background:
+ radial-gradient(120% 90% at 50% 8%, var(--sc-bg-hi) 0%, var(--sc-bg-lo) 62%)}
+.stage::after{content:"";position:absolute;inset:0;pointer-events:none;background:
+ radial-gradient(90% 70% at 50% 108%, rgba(176,141,87,.10), transparent 60%)}
+.viewport{position:absolute;inset:0;perspective:var(--persp);perspective-origin:50% 38%}
+.world{position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
+.ground{position:absolute;left:46.5%;top:54%;width:77.5rem;height:55rem;margin-left:-38.75rem;margin-top:-27.5rem;background:var(--sc-ground);outline:var(--hairline) solid var(--sc-plot-line);transform-style:preserve-3d;
+ background-image:repeating-linear-gradient(0deg,var(--sc-grid) 0 1px,transparent 1px 3.875rem),repeating-linear-gradient(90deg,var(--sc-grid) 0 1px,transparent 1px 3.875rem)}
+.gtag{position:absolute;font-size:var(--fs-micro);letter-spacing:0.2em;text-transform:uppercase;color:var(--sc-num);white-space:nowrap}
+.plot{position:absolute;background:var(--sc-plot);outline:var(--hairline) solid var(--sc-plot-line);transform-style:preserve-3d;cursor:pointer;transition:outline-color .35s ease}
+.plot .pnum{position:absolute;left:.75rem;top:.5rem;font-size:1rem;letter-spacing:0.18em;color:var(--sc-num);transition:color .35s ease}
+.plot.sel{outline:2px solid var(--c-accent)}
+.plot.sel .pnum{color:var(--c-accent)}
+.zone{position:absolute;transform-style:preserve-3d}
+.garden{position:absolute;background:var(--sc-green)}
+.road{position:absolute;background:var(--sc-road);outline:var(--hairline) solid var(--sc-road-line);
+ background-image:repeating-linear-gradient(90deg,var(--sc-road-line) 0 1px,transparent 1px 1.5rem)}
+.road.v{background-image:repeating-linear-gradient(0deg,var(--sc-road-line) 0 1px,transparent 1px 1.5rem)}
+.deck{position:absolute;background:var(--sc-deck);outline:var(--hairline) solid var(--sc-plot-line);transform-style:preserve-3d}
+.water{position:absolute;background:var(--sc-water);box-shadow:inset 0 0 0 1px var(--c-accent-dim)}
+.house{position:absolute;transform-style:preserve-3d;pointer-events:none}
+.face{position:absolute;left:0;top:0;transition:background .35s ease}
+.f-top{background:var(--sc-face-top)}
+.f-top.rg::after{content:"";position:absolute;inset:23%;background:var(--sc-roofgarden);opacity:.6}
+.f-n{background:var(--sc-face-n);transform-origin:0 0}
+.f-s{background:var(--sc-face-s);transform-origin:0 0}
+.f-e{background:var(--sc-face-e);transform-origin:0 0}
+.f-w{background:var(--sc-face-w);transform-origin:0 0}
+.slab .f-top{background:var(--sc-terr-top)}
+.slab .f-n,.slab .f-s,.slab .f-e,.slab .f-w{background:var(--sc-terr-side)}
+.plot.sel .house:not(.slab) .f-top{background:var(--sc-sel-top)}
+.plot.sel .house:not(.slab) .f-n{background:var(--sc-sel-n)}
+.plot.sel .house:not(.slab) .f-s{background:var(--sc-sel-s)}
+.plot.sel .house:not(.slab) .f-e{background:var(--sc-sel-e)}
+.plot.sel .house:not(.slab) .f-w{background:var(--sc-sel-w)}
+
+/* --- накладки поверх сцены --- */
+.scene-head{position:absolute;z-index:5;left:var(--gutter);top:calc(var(--header-h) + var(--s-5));color:var(--c-text-inv);max-width:24rem}
+.scene-head h2{font-size:clamp(1.75rem,2.4vw,2.5rem);margin:var(--s-3) 0 var(--s-4)}
+.chip{display:inline-block;border:var(--hairline) solid var(--c-hairline-inv);color:var(--c-muted-inv);font-size:var(--fs-micro);letter-spacing:0.14em;text-transform:uppercase;padding:var(--s-2) var(--s-3)}
+.hud{position:absolute;z-index:5;left:var(--gutter);bottom:var(--s-6);color:var(--c-muted-inv)}
+.hud-item{display:flex;gap:var(--s-3);align-items:baseline;padding:var(--s-2) 0;border-left:var(--hairline) solid var(--c-hairline-inv);padding-left:var(--s-4);transition:color .3s ease,border-color .3s ease}
+.hud-item .n{font-size:var(--fs-micro);letter-spacing:0.18em}
+.hud-item .t{font-size:var(--fs-small);letter-spacing:0.06em}
+.hud-item.on{color:var(--c-text-inv);border-left-color:var(--c-accent)}
+.hud-item.on .n{color:var(--c-accent)}
+.card{position:absolute;z-index:5;right:var(--gutter);top:50%;transform:translateY(-50%);width:19.5rem;background:var(--c-paper);color:var(--c-text);padding:var(--s-6) var(--s-6) var(--s-5);box-shadow:0 2.5rem 5rem rgba(0,0,0,.45)}
+.card .kicker{color:var(--c-muted)}
+.card-num{font-family:var(--font-display);font-size:var(--fs-cardnum);line-height:1;margin:var(--s-2) 0 var(--s-1)}
+.card-cad{font-size:var(--fs-micro);letter-spacing:0.12em;color:var(--c-muted);margin-bottom:var(--s-5)}
+.card dl{border-top:var(--hairline) solid var(--c-hairline)}
+.card .row{display:flex;justify-content:space-between;align-items:baseline;padding:var(--s-3) 0;border-bottom:var(--hairline) solid var(--c-hairline)}
+.card dt{font-size:var(--fs-micro);letter-spacing:0.16em;text-transform:uppercase;color:var(--c-muted)}
+.card dd{font-family:var(--font-display);font-size:1.125rem}
+.card-status{font-size:var(--fs-micro);letter-spacing:0.14em;text-transform:uppercase;color:var(--c-accent);margin:var(--s-4) 0 var(--s-5)}
+.btn{display:block;text-align:center;background:var(--c-ink);color:var(--c-text-inv);font-size:var(--fs-small);letter-spacing:var(--ls-caps);text-transform:uppercase;padding:var(--s-4) var(--s-5);border:var(--hairline) solid var(--c-ink);transition:background .3s ease,color .3s ease}
+.btn:hover{background:var(--c-accent);border-color:var(--c-accent);color:var(--c-ink)}
+.strip{position:absolute;z-index:5;left:50%;bottom:var(--s-6);transform:translateX(-50%);text-align:center}
+.strip-label{display:block;font-size:var(--fs-micro);letter-spacing:var(--ls-caps);text-transform:uppercase;color:var(--c-muted-inv);margin-bottom:var(--s-3)}
+.strip-btns{display:flex}
+.strip-btns button{width:3rem;height:3rem;background:transparent;border:var(--hairline) solid var(--c-hairline-inv);border-left-width:0;color:var(--c-muted-inv);font-family:var(--font-sans);font-size:var(--fs-small);letter-spacing:0.1em;cursor:pointer;transition:all .3s ease}
+.strip-btns button:first-child{border-left-width:var(--hairline)}
+.strip-btns button:hover{color:var(--c-text-inv)}
+.strip-btns button.sel{background:var(--c-accent);border-color:var(--c-accent);color:var(--c-ink)}
+
+/* ================= территория в цифрах ================= */
+.facts{background:var(--c-canvas);padding:var(--s-9) var(--gutter)}
+.facts-head{max-width:52rem;margin-bottom:var(--s-8)}
+.facts-head h2{font-size:var(--fs-h2);margin:var(--s-4) 0}
+.facts-head p{color:var(--c-muted);max-width:var(--measure)}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);border-left:var(--hairline) solid var(--c-hairline)}
+.stat{border-right:var(--hairline) solid var(--c-hairline);padding:var(--s-5) var(--s-5) var(--s-6)}
+.stat b{display:block;font-family:var(--font-display);font-weight:var(--fw-display);font-size:var(--fs-stat);line-height:1.1}
+.stat b sup{font-size:45%;color:var(--c-accent)}
+.stat span{display:block;margin-top:var(--s-3);font-size:var(--fs-micro);letter-spacing:0.16em;text-transform:uppercase;color:var(--c-muted);max-width:11rem}
+
+/* ================= финал ================= */
+.finale{position:relative;height:92vh;max-height:64rem;min-height:30rem;overflow:hidden;color:var(--c-text-inv)}
+.finale img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.finale::after{content:"";position:absolute;inset:0;background:linear-gradient(to top, rgba(14,17,21,.66), rgba(14,17,21,.05) 55%)}
+.finale-copy{position:absolute;z-index:2;left:var(--gutter);bottom:clamp(3rem,9vh,6rem);max-width:40rem}
+.finale-copy h2{font-size:var(--fs-h2);margin:var(--s-4) 0}
+.finale-copy p{color:rgba(234,229,217,.8);max-width:var(--measure)}
+.finale .plate-note{color:rgba(234,229,217,.5)}
+
+/* ================= приглашение и подвал ================= */
+.invite{background:var(--c-ink);color:var(--c-text-inv);padding:var(--s-9) var(--gutter) var(--s-7)}
+.invite-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:var(--s-8);max-width:70rem}
+.invite h2{font-size:var(--fs-h2);margin:var(--s-4) 0 var(--s-5)}
+.invite p{color:var(--c-muted-inv);max-width:var(--measure)}
+.form{display:grid;gap:var(--s-4);align-content:start;padding-top:var(--s-7)}
+.form input{background:transparent;border:var(--hairline) solid var(--c-hairline-inv);color:var(--c-text-inv);font-family:var(--font-sans);font-size:var(--fs-body);padding:var(--s-4) var(--s-4)}
+.form input::placeholder{color:var(--c-muted-inv)}
+.form input:focus{outline:none;border-color:var(--c-accent)}
+.btn-accent{background:var(--c-accent);border:var(--hairline) solid var(--c-accent);color:var(--c-ink);font-size:var(--fs-small);letter-spacing:var(--ls-caps);text-transform:uppercase;padding:var(--s-4) var(--s-5);cursor:pointer;transition:background .3s ease,color .3s ease}
+.btn-accent:hover{background:transparent;color:var(--c-accent)}
+.form .micro{color:var(--c-muted-inv);letter-spacing:0.1em;text-transform:none}
+.legal{margin-top:var(--s-8);padding-top:var(--s-5);border-top:var(--hairline) solid var(--c-hairline-inv);display:flex;justify-content:space-between;gap:var(--s-6);flex-wrap:wrap;color:var(--c-muted-inv);font-size:var(--fs-micro);letter-spacing:0.08em}
+.legal .wordmark{font-size:.875rem;color:var(--c-muted-inv)}
+
+/* ================= адаптив ================= */
+@media (max-width: 64rem){
+  .stats{grid-template-columns:repeat(2,1fr);border-top:var(--hairline) solid var(--c-hairline)}
+  .invite-grid{grid-template-columns:1fr}
+  .card{right:var(--s-4);width:17rem;padding:var(--s-5)}
+}
+@media (max-width: 47.9rem){
+  .hdr-nav a:not(.hdr-cta){display:none}
+  .card{left:var(--s-4);right:auto;top:auto;bottom:6.5rem;transform:none;width:16rem}
+  .strip{left:auto;right:var(--s-4);transform:none}
+  .hud{display:none}
+  .scene-head{max-width:17rem}
+}
+
+/* ================= служебный режим предпросмотра ================= */
+html.debug .scene-track{height:auto}
+html.debug .stage{position:relative;height:56.25rem;max-height:none}
+html.debug .hero{height:47.5rem}
+html.debug .finale{height:40rem}
+html.debug .rv{opacity:1 !important;transform:none !important;transition:none !important}
+</style>
+</head>
+<body>
+
+<header class="hdr" id="hdr">
+  <a class="wordmark" href="#top">RT&nbsp;Villas</a>
+  <nav class="hdr-nav">
+    <a href="#model">Модель</a>
+    <a href="#facts">Территория</a>
+    <a class="hdr-cta" href="#invite">Запросить</a>
+  </nav>
+</header>
+
+<!-- ============ Первый экран — один кадр, одна строка ============ -->
+<section class="hero" id="top">
+  <img src="assets/33r-aerial.jpg" alt="Посёлок у моря — вид с высоты. Визуализация проекта.">
+  <div class="hero-copy rv">
+    <div class="kicker">Адлер · Сочи · пер. Хостинский</div>
+    <h1 class="h-display">Резиденции у моря.<br>Рассмотрите посёлок целиком.</h1>
+    <p>Закрытая территория с собственной улицей, бассейном и лаунж-зоной.
+       Ниже — объёмная модель посёлка: от высоты птичьего полёта до уровня улицы.</p>
+  </div>
+  <div class="hero-cue">Листайте — камера снижается</div>
+  <div class="plate-note">Визуализация проекта</div>
+</section>
+
+<!-- ============ Объёмная модель посёлка ============ -->
+<section class="scene-track" id="model">
+  <div class="stage" id="stage">
+    <div class="viewport">
+      <div class="world" id="world">
+        <div class="ground" id="ground"></div>
+      </div>
+    </div>
+
+    <div class="scene-head">
+      <div class="kicker">Объёмная модель</div>
+      <h2 class="h-display">Посёлок — как на ладони</h2>
+      <span class="chip">Объёмная схема, не финальная геометрия</span>
+    </div>
+
+    <div class="hud" id="hud">
+      <div class="hud-item on"><span class="n">01</span><span class="t">План — весь надел сверху</span></div>
+      <div class="hud-item"><span class="n">02</span><span class="t">Высота — объёмы и дворы</span></div>
+      <div class="hud-item"><span class="n">03</span><span class="t">Квартал — улица и бассейн</span></div>
+      <div class="hud-item"><span class="n">04</span><span class="t">Улица — масштаб человека</span></div>
+    </div>
+
+    <aside class="card" aria-live="polite">
+      <div class="kicker">Резиденция</div>
+      <div class="card-num" id="c-num">01</div>
+      <div class="card-cad" id="c-cad">23:49:0402016:2525</div>
+      <dl>
+        <div class="row"><dt>Участок</dt><dd id="c-plot">443 м²</dd></div>
+        <div class="row"><dt>Дом</dt><dd id="c-cap">до 265,8 м²</dd></div>
+        <div class="row"><dt>Террасы</dt><dd id="c-terr">114 м²</dd></div>
+        <div class="row"><dt>Сад</dt><dd id="c-garden">156 м²</dd></div>
+        <div class="row"><dt>Уровни</dt><dd>до 3</dd></div>
+      </dl>
+      <div class="card-status">Предпродажа · по приглашению</div>
+      <a class="btn" href="#invite">Запросить</a>
+    </aside>
+
+    <div class="strip">
+      <span class="strip-label">Резиденции посёлка</span>
+      <div class="strip-btns" id="strip"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Территория в цифрах ============ -->
+<section class="facts" id="facts">
+  <div class="facts-head rv">
+    <div class="kicker">Территория</div>
+    <h2 class="h-display">Территория, посчитанная до метра.</h2>
+    <p>Каждая цифра ниже — из проектной документации посёлка. Мы показываем то, что измерено.</p>
+  </div>
+  <div class="stats rv">
+    <div class="stat"><b>3&nbsp;727<sup>&nbsp;м²</sup></b><span>участки резиденций и собственная улица</span></div>
+    <div class="stat"><b>1&nbsp;128<sup>&nbsp;м²</sup></b><span>брусчатка улицы и дворов</span></div>
+    <div class="stat"><b>859<sup>&nbsp;м²</sup></b><span>ландшафтное озеленение</span></div>
+    <div class="stat"><b>835<sup>&nbsp;м²</sup></b><span>террасы и благоустройство</span></div>
+    <div class="stat"><b>204<sup>&nbsp;м²</sup></b><span>общий бассейн</span></div>
+  </div>
+</section>
+
+<!-- ============ Финал — вечерний кадр ============ -->
+<section class="finale">
+  <img src="assets/19rn-pool.jpg" alt="Общий бассейн и лаунж-зона на закате. Визуализация проекта.">
+  <div class="finale-copy rv">
+    <div class="kicker">Вечер в посёлке</div>
+    <h2 class="h-display">Свет заката — часть архитектуры.</h2>
+    <p>Общий бассейн и лаунж-зона обращены к морю. Вечером территория живёт мягкой подсветкой.</p>
+  </div>
+  <div class="plate-note">Визуализация проекта</div>
+</section>
+
+<!-- ============ Приглашение ============ -->
+<footer class="invite" id="invite">
+  <div class="invite-grid">
+    <div class="rv">
+      <div class="kicker">Доступ</div>
+      <h2 class="h-display">По приглашению.</h2>
+      <p>Посёлок камерный, поэтому и знакомство с ним личное: покажем модель, документы
+         по каждому участку и саму территорию. Оставьте контакт — вернёмся лично.</p>
+    </div>
+    <form class="form rv" action="#" method="post" onsubmit="return false">
+      <input type="text" name="name" placeholder="Имя" autocomplete="name">
+      <input type="tel" name="phone" placeholder="Телефон или Telegram" autocomplete="tel">
+      <button class="btn-accent" type="submit">Запросить приглашение</button>
+      <span class="micro">Отвечаем лично, без рассылок.</span>
+    </form>
+  </div>
+  <div class="legal">
+    <span class="wordmark">RT&nbsp;Villas</span>
+    <span>RT VILLAS — рабочее обозначение проекта. Параметры — из проектной и градостроительной документации. Не является публичной офертой.</span>
+  </div>
+</footer>
+
+<script>
+document.documentElement.classList.replace('no-js','js');
+
+/* ===== Данные участков (ЕГРН/СПОЗУ) — питают модель и карточку ===== */
+const VILLAS=[
+ {id:'01',cad:'23:49:0402016:2525',plot:'443 м²',cap:'до 265,8 м²',terr:'114 м²',garden:'156 м²',x:40,y:260,w:335,d:240,hx:84,hy:78,hw:176,hd:118,hh:100},
+ {id:'02',cad:'23:49:0402016:2526',plot:'531 м²',cap:'до 300 м²',terr:'92 м²',garden:'114 м²',x:391,y:260,w:401,d:240,hx:106,hy:82,hw:190,hd:114,hh:108},
+ {id:'03',cad:'23:49:0402016:2527',plot:'518 м²',cap:'до 300 м²',terr:'110 м²',garden:'155 м²',x:808,y:260,w:392,d:240,hx:100,hy:80,hw:187,hd:111,hh:108},
+ {id:'04',cad:'23:49:0402016:2521',plot:'458 м²',cap:'до 274,8 м²',terr:'116 м²',garden:'110 м²',x:120,y:590,w:280,d:240,hx:60,hy:78,hw:160,hd:105,hh:102},
+ {id:'05',cad:'23:49:0402016:2522',plot:'435 м²',cap:'до 261 м²',terr:'100 м²',garden:'106 м²',x:416,y:590,w:264,d:240,hx:57,hy:80,hw:150,hd:99,hh:100},
+ {id:'06',cad:'23:49:0402016:2523',plot:'400 м²',cap:'до 240 м²',terr:'68 м²',garden:'74 м²',x:696,y:590,w:248,d:240,hx:48,hy:78,hw:152,hd:102,hh:94},
+ {id:'07',cad:'23:49:0402016:2536',plot:'506 м²',cap:'до 300 м²',terr:'82 м²',garden:'86 м²',x:960,y:590,w:240,d:240,hx:55,hy:82,hw:130,hd:92,hh:104}
+];
+
+/* ===== Сборка объёмной сцены (CSS-3D) ===== */
+const ground=document.getElementById('ground');
+function el(cls,css){const d=document.createElement('div');d.className=cls;Object.assign(d.style,css);return d;}
+function px(n){return n+'px';}
+function box(w,d,h,cls){
+  const b=el('house'+(cls?' '+cls:''),{width:px(w),height:px(d)});
+  const rg=(!cls&&h>20)?' rg':'';
+  b.appendChild(el('face f-top'+rg,{width:px(w),height:px(d),transform:'translateZ('+h+'px)'}));
+  b.appendChild(el('face f-n',{width:px(w),height:px(h),transform:'rotateX(90deg)'}));
+  b.appendChild(el('face f-s',{width:px(w),height:px(h),transform:'translateY('+d+'px) rotateX(90deg)'}));
+  b.appendChild(el('face f-w',{width:px(d),height:px(h),transform:'rotateZ(90deg) rotateX(90deg)'}));
+  b.appendChild(el('face f-e',{width:px(d),height:px(h),transform:'translateX('+w+'px) rotateZ(90deg) rotateX(90deg)'}));
+  return b;
+}
+/* подписи на плане */
+ground.appendChild(el('gtag',{left:'12px',top:'-28px'})).textContent='КАД. КВАРТАЛ 23:49:0402016';
+ground.appendChild(el('gtag',{right:'12px',bottom:'-28px'})).textContent='ОБЪЁМНАЯ СХЕМА · БЕЗ МАСШТАБА';
+/* площадка бассейна и лаунжа */
+const deck=el('deck',{left:px(40),top:px(40),width:px(390),height:px(200)});
+deck.appendChild(el('water',{left:px(60),top:px(46),width:px(220),height:px(108)}));
+const lounge=box(70,120,6,'slab');Object.assign(lounge.style,{left:px(300),top:px(40)});
+deck.appendChild(lounge);
+const dtag=el('gtag',{left:px(64),top:px(162)});dtag.textContent='бассейн · лаунж';deck.appendChild(dtag);
+ground.appendChild(deck);
+/* общий ландшафтный участок */
+const green=el('garden',{left:px(446),top:px(40),width:px(754),height:px(200),outline:'1px solid var(--sc-plot-line)'});
+const gt=el('gtag',{right:px(16),bottom:px(10),position:'absolute'});gt.textContent='ландшафт';green.appendChild(gt);
+ground.appendChild(green);
+/* улица и въезд */
+ground.appendChild(el('road',{left:px(40),top:px(510),width:px(1160),height:px(60)}));
+ground.appendChild(el('road v',{left:px(40),top:px(570),width:px(60),height:px(310)}));
+const rtag=el('gtag',{left:px(540),top:px(530)});rtag.textContent='частная улица';ground.appendChild(rtag);
+const etag=el('gtag',{left:px(112),top:px(846)});etag.textContent='выезд — пер. Хостинский';ground.appendChild(etag);
+/* участки вилл */
+VILLAS.forEach((v,i)=>{
+  const p=el('plot',{left:px(v.x),top:px(v.y),width:px(v.w),height:px(v.d)});
+  p.dataset.i=i;
+  const num=el('pnum');num.className='pnum';num.textContent=v.id;p.appendChild(num);
+  p.appendChild(el('garden',{left:px(12),top:px(v.hy+v.hd+14),width:px(v.w-24),height:px(v.d-(v.hy+v.hd)-26)}));
+  const t=box(v.hw,42,7,'slab');Object.assign(t.style,{left:px(v.hx),top:px(v.hy-48)});p.appendChild(t);
+  const h=box(v.hw,v.hd,v.hh);Object.assign(h.style,{left:px(v.hx),top:px(v.hy)});p.appendChild(h);
+  p.addEventListener('mouseenter',()=>select(i));
+  p.addEventListener('click',()=>select(i));
+  ground.appendChild(p);
+});
+
+/* ===== Карточка резиденции ===== */
+const strip=document.getElementById('strip');
+VILLAS.forEach((v,i)=>{const b=document.createElement('button');b.type='button';b.textContent=v.id;b.addEventListener('click',()=>select(i));b.addEventListener('mouseenter',()=>select(i));strip.appendChild(b);});
+let SEL=-1;
+function select(i){
+  if(SEL===i)return;SEL=i;const v=VILLAS[i];
+  document.querySelectorAll('.plot').forEach((p,j)=>p.classList.toggle('sel',j===i));
+  strip.querySelectorAll('button').forEach((b,j)=>b.classList.toggle('sel',j===i));
+  document.getElementById('c-num').textContent=v.id;
+  document.getElementById('c-cad').textContent=v.cad;
+  document.getElementById('c-plot').textContent=v.plot;
+  document.getElementById('c-cap').textContent=v.cap;
+  document.getElementById('c-terr').textContent=v.terr;
+  document.getElementById('c-garden').textContent=v.garden;
+}
+select(0);
+
+/* ===== Камера, ведомая прокруткой (опорные точки) ===== */
+const WP=[
+ {p:0.00,rx:8, rz:0,  s:0.60,ty:0},
+ {p:0.36,rx:52,rz:-16,s:0.92,ty:10},
+ {p:0.68,rx:66,rz:-34,s:1.38,ty:30},
+ {p:1.00,rx:76,rz:-52,s:2.05,ty:90}
+];
+const world=document.getElementById('world');
+const track=document.getElementById('model');
+const stage=document.getElementById('stage');
+const hudItems=[...document.querySelectorAll('.hud-item')];
+const smooth=t=>t*t*(3-2*t);
+function camera(p){
+  let a=WP[0],b=WP[WP.length-1];
+  for(let k=0;k<WP.length-1;k++){if(p>=WP[k].p&&p<=WP[k+1].p){a=WP[k];b=WP[k+1];break;}}
+  const t=b.p===a.p?0:smooth((p-a.p)/(b.p-a.p));
+  const L=(x,y)=>x+(y-x)*t;
+  world.style.transform='translate3d(0,'+L(a.ty,b.ty)+'px,0) scale('+L(a.s,b.s)+') rotateX('+L(a.rx,b.rx)+'deg) rotateZ('+L(a.rz,b.rz)+'deg)';
+  let beat=0;WP.forEach((w,k)=>{if(p>=w.p-0.02)beat=k;});
+  hudItems.forEach((h,k)=>h.classList.toggle('on',k===beat));
+}
+let ticking=false;
+function onScroll(){
+  if(ticking)return;ticking=true;
+  requestAnimationFrame(()=>{
+    ticking=false;
+    const y=window.scrollY;
+    const run=track.offsetHeight-stage.offsetHeight;
+    const p=Math.max(0,Math.min(1,(y-track.offsetTop)/(run||1)));
+    camera(p);
+    document.getElementById('hdr').classList.toggle('solid',y>window.innerHeight*0.7);
+  });
+}
+
+/* ===== Плавные появления секций ===== */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target);}}),{threshold:0.2});
+document.querySelectorAll('.rv').forEach(n=>io.observe(n));
+
+/* ===== Служебный режим предпросмотра (?p=0..1 — развёрнутая страница, фиксированная камера) ===== */
+const q=new URLSearchParams(location.search);
+if(q.has('p')){
+  document.documentElement.classList.add('debug');
+  camera(Math.max(0,Math.min(1,parseFloat(q.get('p'))||0)));
+  if(q.has('v'))select(Math.max(0,Math.min(6,parseInt(q.get('v'),10)||0)));
+}else{
+  addEventListener('scroll',onScroll,{passive:true});
+  onScroll();
+}
+</script>
+</body>
+</html>

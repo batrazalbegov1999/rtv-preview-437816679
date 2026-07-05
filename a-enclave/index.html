@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RT VILLAS — Анклав. По приглашению</title>
+<meta name="description" content="Закрытый анклав частных резиденций на Черноморском побережье. Адлерский район, Сочи. Доступ — по приглашению.">
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* ============================================================
+   Структурные стили. Палитра, типографика и отступы — в tokens.css.
+   ============================================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--c-canvas);
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; display: block; }
+
+h1, h2, h3, .display {
+  font-family: var(--font-display);
+  font-weight: var(--fw-display);
+  letter-spacing: var(--ls-display);
+  line-height: var(--lh-display);
+}
+
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--fs-eyebrow);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--c-accent);
+}
+
+.wrap { max-width: var(--content-max); margin: 0 auto; padding: 0 var(--pad-x); }
+.narrow { max-width: var(--content-narrow); }
+
+section { padding: var(--sp-7) 0; }
+
+.rule { width: 55px; height: 1px; background: var(--c-accent); border: 0; margin: var(--sp-4) 0; }
+
+/* ---------- плавные появления при прокрутке ---------- */
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity var(--dur-fade) var(--ease-quiet), transform var(--dur-fade) var(--ease-quiet); }
+.reveal.is-in { opacity: 1; transform: none; }
+
+/* ============================================================
+   Шапка — прозрачная над обложкой, плотная после прокрутки.
+   ============================================================ */
+header {
+  position: fixed; inset: 0 0 auto 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--sp-3) var(--pad-x);
+  background: linear-gradient(to bottom, rgba(7,10,16,.55), rgba(7,10,16,0));
+  transition: background var(--dur-ui) var(--ease-quiet), border-color var(--dur-ui) var(--ease-quiet);
+  border-bottom: 1px solid transparent;
+}
+header.is-solid {
+  background: var(--c-header-solid);
+  border-bottom: 1px solid var(--c-hairline-dim);
+}
+.wordmark {
+  font-family: var(--font-display);
+  font-size: 1.35rem; letter-spacing: 0.22em; color: var(--c-ink);
+  text-decoration: none; white-space: nowrap;
+}
+.wordmark span { color: var(--c-accent); }
+.cta {
+  display: inline-block;
+  font-family: var(--font-sans); font-size: var(--fs-small);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--c-ink); text-decoration: none;
+  border: 1px solid var(--c-accent); border-radius: var(--radius);
+  padding: 0.8em 1.9em;
+  transition: background var(--dur-ui) var(--ease-quiet), color var(--dur-ui) var(--ease-quiet);
+  white-space: nowrap;
+}
+.cta:hover { background: var(--c-accent); color: var(--c-veil); }
+
+/* ============================================================
+   Обложка — занавес поднимается при прокрутке.
+   Текст поверх изображения всегда лежит на затемняющей подложке.
+   ============================================================ */
+.hero-track { height: var(--hero-track); position: relative; }
+.hero-stage { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+
+.hero-img {
+  position: absolute; inset: 0;
+  background: var(--img-hero) center 38% / cover no-repeat;
+  transform: scale(calc(1.07 - var(--unveil) * 0.07));
+  filter: brightness(calc(0.72 + var(--unveil) * 0.28));
+}
+/* градиент у основания — текстовая зона остаётся читаемой */
+.hero-img::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(7,10,16,.82) 0%, rgba(7,10,16,.28) 34%, rgba(7,10,16,0) 60%);
+}
+
+.veil {
+  position: absolute; inset: 0; z-index: 2;
+  background:
+    radial-gradient(ellipse 52% 34% at 50% 52%, rgba(176,141,87,0.10), transparent 70%),
+    repeating-linear-gradient(115deg, rgba(234,229,217,0.017) 0 2px, transparent 2px 9px),
+    linear-gradient(to bottom, #0A0E15, var(--c-veil) 55%, #05070C);
+  transform: translateY(calc(var(--unveil) * -101%));
+  border-bottom: 1px solid var(--c-hairline);
+  display: flex; align-items: center; justify-content: center; text-align: center;
+}
+.veil::after {
+  content: ""; position: absolute; inset: clamp(14px, 2.2vw, 30px);
+  border: 1px solid var(--c-hairline-dim); pointer-events: none;
+}
+.veil-inner { padding: 0 var(--pad-x); max-width: 62rem; opacity: calc(1 - var(--unveil) * 1.6); }
+.veil-inner .eyebrow { display: block; margin-bottom: var(--sp-4); }
+.veil h1 { font-size: var(--fs-display); color: var(--c-ink); }
+.veil h1 em { font-style: italic; color: var(--c-accent-bright); }
+.veil p { margin-top: var(--sp-4); color: var(--c-ink-dim); font-size: var(--fs-lead); }
+.scroll-cue {
+  margin: var(--sp-5) auto 0; width: 1px; height: 72px;
+  background: linear-gradient(to bottom, var(--c-accent), transparent);
+}
+
+/* подпись поверх открывшегося кадра — на затемняющей подложке */
+.hero-chapter {
+  position: absolute; z-index: 3; left: var(--pad-x); bottom: 9vh;
+  max-width: 34rem;
+  background: var(--c-scrim);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  border-left: 1px solid var(--c-accent);
+  padding: var(--sp-4) var(--sp-5) var(--sp-4) var(--sp-4);
+  opacity: calc((var(--unveil) - 0.45) * 3);
+  transform: translateY(calc((1 - var(--unveil)) * 30px));
+}
+.hero-chapter .eyebrow { display: block; margin-bottom: var(--sp-2); }
+.hero-chapter p { font-family: var(--font-display); font-size: var(--fs-h3); line-height: 1.3; }
+
+/* ============================================================
+   Манифест — ключевой текст на первой плотной секции.
+   ============================================================ */
+.manifesto { text-align: left; border-bottom: 1px solid var(--c-hairline-dim); }
+.manifesto h2 { font-size: var(--fs-h2); max-width: 18em; }
+.manifesto h2 em { font-style: italic; color: var(--c-accent-bright); }
+.manifesto .lead { font-size: var(--fs-lead); color: var(--c-ink-dim); max-width: var(--measure); margin-top: var(--sp-4); }
+.manifesto .cols {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--sp-5); margin-top: var(--sp-6);
+}
+.manifesto .cols p { color: var(--c-ink-dim); font-size: var(--fs-body); }
+.manifesto .cols strong { color: var(--c-ink); font-weight: 500; }
+
+/* ============================================================
+   Мир — три вертикали образа жизни.
+   ============================================================ */
+.world { padding-bottom: 0; }
+.world-head { margin-bottom: var(--sp-6); }
+.world-head h2 { font-size: var(--fs-h2); }
+.world-head p { color: var(--c-ink-dim); max-width: var(--measure); margin-top: var(--sp-3); font-size: var(--fs-lead); }
+.verticals { display: flex; min-height: 76vh; }
+.vertical {
+  position: relative; flex: 1 1 0; overflow: hidden;
+  border-right: 1px solid rgba(7,10,16,.9);
+  transition: flex var(--dur-fade) var(--ease-quiet);
+  display: flex; align-items: flex-end;
+  min-height: 76vh;
+}
+.vertical:last-child { border-right: 0; }
+.vertical:hover { flex: 2.6 1 0; }
+.vertical .bg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: brightness(.62) saturate(.92); transition: filter var(--dur-fade) var(--ease-quiet); }
+.vertical:hover .bg { filter: brightness(.8) saturate(1); }
+.v-res .bg   { background-image: var(--img-night); }
+.v-water .bg { background-image: var(--img-hero); background-position: center 60%; }
+.v-land .bg  { background-image: var(--img-aerial); }
+.vertical .label {
+  position: relative; z-index: 2; width: 100%;
+  padding: var(--sp-5) var(--sp-4);
+  background: linear-gradient(to top, var(--c-scrim-strong), transparent);
+}
+.vertical .label h3 { font-size: var(--fs-h3); }
+.vertical .label p { color: var(--c-ink-dim); font-size: var(--fs-small); margin-top: var(--sp-2); max-width: 26em; }
+.vertical .label .eyebrow { display: block; margin-bottom: var(--sp-2); letter-spacing: 0.28em; }
+
+/* ============================================================
+   Фактура — ключевые цифры.
+   ============================================================ */
+.facts { border-bottom: 1px solid var(--c-hairline-dim); }
+.facts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); gap: var(--sp-5) var(--sp-6); }
+.fact { border-top: 1px solid var(--c-hairline-dim); padding-top: var(--sp-3); }
+.fact .num { font-family: var(--font-display); font-size: var(--fs-stat); color: var(--c-ink); white-space: nowrap; }
+.fact .num sup { font-size: 45%; color: var(--c-accent); }
+.fact .cap { color: var(--c-ink-faint); font-size: var(--fs-small); margin-top: var(--sp-2); letter-spacing: 0.06em; }
+.facts .note { margin-top: var(--sp-5); color: var(--c-ink-faint); font-size: var(--fs-small); max-width: var(--measure); }
+
+/* ============================================================
+   Письмо управляющего.
+   ============================================================ */
+.host { background: var(--c-panel); }
+.host-grid { display: grid; grid-template-columns: minmax(200px, 1fr) 2.2fr; gap: var(--sp-6); align-items: start; }
+.medallion {
+  aspect-ratio: 3 / 4; border: 1px solid var(--c-hairline);
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(160deg, var(--c-panel-2), var(--c-veil));
+}
+.medallion span { font-family: var(--font-display); font-size: 4.4rem; color: var(--c-accent); font-style: italic; }
+.letter .eyebrow { display: block; margin-bottom: var(--sp-3); }
+.letter h2 { font-size: var(--fs-h2); margin-bottom: var(--sp-4); }
+.letter p { color: var(--c-ink-dim); max-width: var(--measure); margin-bottom: var(--sp-3); }
+.letter .sig { margin-top: var(--sp-4); font-family: var(--font-display); font-style: italic; font-size: var(--fs-h3); color: var(--c-ink); }
+.letter .sig-role { color: var(--c-ink-faint); font-size: var(--fs-small); margin-top: var(--sp-1); letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ============================================================
+   Резиденции — детали передаются лично.
+   ============================================================ */
+.residences .split { display: grid; grid-template-columns: 1.25fr 1fr; gap: var(--sp-6); align-items: center; }
+.residences figure { border: 1px solid var(--c-hairline-dim); }
+.residences figure img { filter: brightness(.9); }
+.residences h2 { font-size: var(--fs-h2); }
+.residences p { color: var(--c-ink-dim); margin-top: var(--sp-3); max-width: var(--measure); }
+.residences .quiet-list { list-style: none; margin-top: var(--sp-4); }
+.residences .quiet-list li {
+  padding: var(--sp-3) 0; border-top: 1px solid var(--c-hairline-dim);
+  color: var(--c-ink); display: flex; justify-content: space-between; gap: var(--sp-3);
+  font-size: var(--fs-body);
+}
+.residences .quiet-list li span:last-child { color: var(--c-ink-dim); text-align: right; }
+
+/* ============================================================
+   Приглашение — единственная форма на странице.
+   ============================================================ */
+.invite { background: var(--c-panel); border-top: 1px solid var(--c-hairline-dim); }
+.invite .narrow { text-align: center; margin: 0 auto; }
+.invite h2 { font-size: var(--fs-h2); }
+.invite .sub { color: var(--c-ink-dim); margin: var(--sp-3) auto var(--sp-6); max-width: var(--measure); }
+.invite form { display: grid; gap: var(--sp-3); text-align: left; }
+.invite label { font-size: var(--fs-eyebrow); letter-spacing: 0.22em; text-transform: uppercase; color: var(--c-ink-faint); }
+.invite input, .invite select {
+  width: 100%; background: var(--c-panel-2); color: var(--c-ink);
+  border: 1px solid var(--c-hairline-dim); border-radius: var(--radius);
+  padding: 1em 1.1em; font-family: var(--font-sans); font-size: var(--fs-body);
+  appearance: none; -webkit-appearance: none;
+}
+.invite input:focus, .invite select:focus { outline: none; border-color: var(--c-accent); }
+.invite .field { display: grid; gap: var(--sp-1); }
+.invite button {
+  margin-top: var(--sp-4); cursor: pointer;
+  background: var(--c-accent); color: var(--c-veil);
+  border: 1px solid var(--c-accent); border-radius: var(--radius);
+  padding: 1.1em 2em; font-size: var(--fs-small);
+  letter-spacing: 0.2em; text-transform: uppercase; font-family: var(--font-sans);
+  transition: background var(--dur-ui) var(--ease-quiet);
+}
+.invite button:hover { background: var(--c-accent-bright); }
+.invite .promise { margin-top: var(--sp-4); color: var(--c-ink-faint); font-size: var(--fs-small); text-align: center; }
+
+/* ============================================================
+   Подвал
+   ============================================================ */
+footer { padding: var(--sp-6) 0; border-top: 1px solid var(--c-hairline-dim); }
+.foot-row { display: flex; flex-wrap: wrap; gap: var(--sp-4); justify-content: space-between; align-items: baseline; }
+footer .wordmark { font-size: 1.1rem; }
+footer p { color: var(--c-ink-faint); font-size: var(--fs-small); }
+footer .legal { margin-top: var(--sp-4); color: var(--c-ink-faint); font-size: 0.8125rem; }
+
+/* ---------- адаптив ---------- */
+@media (max-width: 900px) {
+  .verticals { flex-direction: column; min-height: 0; }
+  .vertical, .vertical:hover { flex: 1 1 auto; min-height: 46vh; }
+  .vertical { border-right: 0; border-bottom: 1px solid rgba(7,10,16,.9); }
+  .host-grid, .residences .split { grid-template-columns: 1fr; }
+  .medallion { max-width: 260px; }
+  .hero-chapter { right: var(--pad-x); }
+}
+
+/* без JS занавес остаётся полупрозрачным, страница читается целиком */
+</style>
+<noscript><style>.veil { opacity: 0.9; } .hero-track { height: 100vh; }</style></noscript>
+</head>
+<body>
+
+<header id="top">
+  <a class="wordmark" href="#top">RT&nbsp;<span>VILLAS</span></a>
+  <a class="cta" href="#invite">Запросить приглашение</a>
+</header>
+
+<!-- ==================== Обложка ==================== -->
+<div class="hero-track" id="hero">
+  <div class="hero-stage">
+    <div class="hero-img" role="img" aria-label="Резиденция анклава на закате, вид на море"></div>
+
+    <div class="hero-chapter">
+      <span class="eyebrow">Занавес поднимается</span>
+      <p>То, что скрывали от посторонних глаз, открывается&nbsp;— тем, кого здесь ждут.</p>
+    </div>
+
+    <div class="veil">
+      <div class="veil-inner">
+        <span class="eyebrow">RT Villas · Адлер · Сочи</span>
+        <h1>По&nbsp;<em>приглашению</em></h1>
+        <p>Каждый анклав начинается под покровом.<br>Прокрутите — и занавес поднимется.</p>
+        <div class="scroll-cue" aria-hidden="true"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Манифест ==================== -->
+<section class="manifesto">
+  <div class="wrap">
+    <span class="eyebrow reveal">Анклав</span>
+    <hr class="rule reveal">
+    <h2 class="reveal">Адрес, который <em>не называют вслух</em>.</h2>
+    <p class="lead reveal">Анклав — это не комплекс и не посёлок. Это закрытый мир на Черноморском побережье, устроенный по законам частного клуба: сюда не приходят — сюда принимают.</p>
+    <div class="cols">
+      <p class="reveal"><strong>Утро.</strong> Тишина собственного сада, завтрак у воды, море — фоном, а не событием. Внутри периметра нет случайных людей: каждый сосед прошёл тот же порог приглашения, что и вы.</p>
+      <p class="reveal"><strong>День.</strong> Семь резиденций стоят свободно, каждая на собственной земле. Между ними — частный проезд, клуб у бассейна и сад, который принадлежит только резидентам.</p>
+      <p class="reveal"><strong>Вечер.</strong> Свет уходит за горизонт, и анклав закрывается от мира, как дом закрывает дверь. Всё, что нужно, — уже внутри.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== Мир анклава ==================== -->
+<section class="world">
+  <div class="wrap world-head">
+    <span class="eyebrow reveal">Мир анклава</span>
+    <hr class="rule reveal">
+    <h2 class="reveal">Сначала — мир. Потом — резиденция.</h2>
+    <p class="reveal">Резиденция здесь — не квадратные метры, а членство в закрытом мире. Три его измерения:</p>
+  </div>
+  <div class="verticals">
+    <div class="vertical v-res reveal">
+      <div class="bg"></div>
+      <div class="label">
+        <span class="eyebrow">I</span>
+        <h3>Резиденции</h3>
+        <p>Частные дома на собственных участках — свободная посадка, свой сад, своя граница тишины.</p>
+      </div>
+    </div>
+    <div class="vertical v-water reveal">
+      <div class="bg"></div>
+      <div class="label">
+        <span class="eyebrow">II</span>
+        <h3>Вода</h3>
+        <p>Клубный бассейн на отдельной земле анклава — место, где день замедляется до скорости заката.</p>
+      </div>
+    </div>
+    <div class="vertical v-land reveal">
+      <div class="bg"></div>
+      <div class="label">
+        <span class="eyebrow">III</span>
+        <h3>Территория</h3>
+        <p>Единый закрытый контур: частный проезд, сады резиденций, зелень по всему периметру.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== Фактура ==================== -->
+<section class="facts">
+  <div class="wrap">
+    <span class="eyebrow reveal">Фактура</span>
+    <hr class="rule reveal">
+    <div class="facts-grid">
+      <div class="fact reveal">
+        <div class="num">400–531 <sup>м²</sup></div>
+        <div class="cap">частные участки резиденций</div>
+      </div>
+      <div class="fact reveal">
+        <div class="num">до 300 <sup>м²</sup></div>
+        <div class="cap">площадь резиденции</div>
+      </div>
+      <div class="fact reveal">
+        <div class="num">3 <sup>уровня</sup></div>
+        <div class="cap">высотный регламент — до 12 метров</div>
+      </div>
+      <div class="fact reveal">
+        <div class="num">30<sup>%</sup></div>
+        <div class="cap">территории — сад и озеленение, не менее</div>
+      </div>
+    </div>
+    <p class="note reveal">Адлерский район Сочи, переулок Хостинский. Земли населённых пунктов, индивидуальное жилищное строительство. Детали — при личной встрече.</p>
+  </div>
+</section>
+
+<!-- ==================== Письмо ==================== -->
+<section class="host">
+  <div class="wrap host-grid">
+    <div class="medallion reveal" aria-label="Управляющий анклава"><span>А</span></div>
+    <div class="letter">
+      <span class="eyebrow reveal">Письмо</span>
+      <h2 class="reveal">Вас здесь будут знать по имени.</h2>
+      <p class="reveal">Анклав из семи резиденций — это масштаб, при котором управление остаётся личным. Я не работаю с потоком: каждого будущего резидента я встречаю сам, показываю территорию сам и отвечаю на вопросы, на которые не отвечают брошюры.</p>
+      <p class="reveal">Мы не публикуем каталог и не называем цен на сайте. Не из снобизма — из уважения: разговор о доме такого порядка не ведут через прайс-лист. Напишите нам, и я подготовлю к встрече всё, что вам понадобится для решения.</p>
+      <p class="sig reveal">— Управляющий Анклава</p>
+      <p class="sig-role reveal">Личный приём резидентов и гостей</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== Резиденции ==================== -->
+<section class="residences">
+  <div class="wrap split">
+    <figure class="reveal">
+      <img src="assets/aerial-seafront.jpg" alt="Анклав с высоты: резиденции у побережья" loading="lazy">
+    </figure>
+    <div>
+      <span class="eyebrow reveal">Резиденции</span>
+      <hr class="rule reveal">
+      <h2 class="reveal">Считанные дома. <em>Ни одного случайного.</em></h2>
+      <p class="reveal">Каждая резиденция спроектирована под свой участок и свой сценарий жизни — у воды, в глубине сада, на линии заката. Планировки, отделка и условия передаются лично, после приглашения.</p>
+      <ul class="quiet-list reveal">
+        <li><span>Формат</span><span>отдельный дом на собственном участке</span></li>
+        <li><span>Участки</span><span>от 400 до 531 м²</span></li>
+        <li><span>Дом</span><span>до 300 м², до трёх уровней</span></li>
+        <li><span>Детали</span><span>по приглашению</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== Приглашение ==================== -->
+<section class="invite" id="invite">
+  <div class="wrap narrow">
+    <span class="eyebrow reveal">Вход</span>
+    <h2 class="reveal">Запросить приглашение</h2>
+    <p class="sub reveal">Короткое письмо — и мы назначим личную встречу в анклаве. Без рассылок, без менеджеров по скриптам.</p>
+    <form onsubmit="return false" class="reveal">
+      <div class="field">
+        <label for="f-name">Как к вам обращаться</label>
+        <input id="f-name" name="name" type="text" autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="f-contact">Телефон или Telegram</label>
+        <input id="f-contact" name="contact" type="text" autocomplete="tel">
+      </div>
+      <div class="field">
+        <label for="f-budget">Рамка бюджета — на ваше усмотрение</label>
+        <select id="f-budget" name="budget">
+          <option value="">Предпочту обсудить лично</option>
+          <option>До 300 млн ₽</option>
+          <option>300–700 млн ₽</option>
+          <option>Свыше 700 млн ₽</option>
+        </select>
+      </div>
+      <button type="submit">Запросить приглашение</button>
+    </form>
+    <p class="promise reveal">Ответим лично, в течение суток.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-row">
+      <a class="wordmark" href="#top">RT&nbsp;<span>VILLAS</span></a>
+      <p>Сочи · Адлерский район · пер. Хостинский</p>
+      <p>По приглашению</p>
+    </div>
+    <p class="legal">Материалы страницы носят информационный характер и не являются публичной офертой. Изображения — архитектурная визуализация.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var hero = document.getElementById('hero');
+  var header = document.querySelector('header');
+
+  /* прокрутка обложки: переменная --unveil идёт от 0 к 1 */
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      var rect = hero.getBoundingClientRect();
+      var track = rect.height - window.innerHeight;
+      var p = track > 0 ? Math.min(1, Math.max(0, -rect.top / track)) : 1;
+      root.style.setProperty('--unveil', p.toFixed(4));
+      /* шапка становится плотной после обложки */
+      header.classList.toggle('is-solid', rect.bottom <= window.innerHeight * 1.02);
+      ticking = false;
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* плавные появления секций */
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+/* ============================================================
+   RT VILLAS — концепт «Досье» · дизайн-токены
+   Все цвета, шрифты, размеры и отступы живут здесь как custom
+   properties; index.html ссылается на них и не хранит значений.
+   ============================================================ */
+
+:root {
+  /* ---- шрифтовые стеки (системные, с полной кириллицей; без внешних загрузок) ---- */
+  --font-display: Georgia, "Times New Roman", "Noto Serif", serif;
+  --font-sans: "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+
+  /* ---- шкала кегля ---- */
+  --fs-hero: clamp(44px, 5.4vw, 76px);
+  --fs-h2: clamp(30px, 3.2vw, 46px);
+  --fs-h3: 24px;
+  --fs-body: 18px;
+  --fs-small: 15px;
+  --fs-label: 11px;
+  --fs-data: 15px;
+  --fs-data-big: 32px;
+
+  --lh-hero: 1.08;
+  --lh-body: 1.65;
+  --ls-label: 0.18em;
+  --ls-wordmark: 0.34em;
+
+  /* ---- палитра (60/30/10: слоновая кость / графит / бронза) ---- */
+  --c-canvas: #f4f0e7;          /* 60 — тёплая слоновая кость */
+  --c-canvas-deep: #ebe5d7;     /* чередование секций */
+  --c-ink: #22211d;             /* 30 — тёплый графит */
+  --c-ink-soft: #55524a;        /* вторичный текст */
+  --c-accent: #93704a;          /* 10 — единственный акцент, бронза */
+  --c-accent-ink: #7c5c3a;      /* бронза на hover / тёмном фоне */
+  --c-paper: #faf8f2;           /* бумага карточек */
+  --c-line: rgba(34, 33, 29, 0.18);      /* тонкие линии */
+  --c-line-strong: rgba(34, 33, 29, 0.55);
+  --c-inverse-text: #f4f0e7;    /* текст поверх фотографий */
+
+  /* ---- структура ---- */
+  --radius: 0px;                /* прямые углы везде */
+  --rule: 1px solid var(--c-line);
+  --rule-strong: 1px solid var(--c-line-strong);
+  --border-accent: 1px solid var(--c-accent);
+
+  /* ---- отступы (щедрый воздух) ---- */
+  --sp-1: 8px;
+  --sp-2: 16px;
+  --sp-3: 24px;
+  --sp-4: 40px;
+  --sp-5: 64px;
+  --sp-6: 96px;
+  --sp-section: clamp(96px, 12vw, 160px);
+  --page-max: 1240px;
+  --page-pad: clamp(20px, 4vw, 56px);
+
+  /* ---- компоненты ---- */
+  --header-h: 72px;
+  --plot-fill: rgba(34, 33, 29, 0.03);
+  --plot-fill-hover: rgba(147, 112, 74, 0.16);
+  --sea-fill: rgba(34, 33, 29, 0.07);
+  --shadow-card: 0 1px 0 rgba(34, 33, 29, 0.12);
+
+  /* ---- движение: только тихие переходы ---- */
+  --t-quiet: 0.35s ease;
+}
